@@ -1,0 +1,7 @@
+.Tilt{
+    background: white;
+    display: flex;
+    justify-content: center; 
+    align-items: center; 
+    opacity: 0.7;
+}
