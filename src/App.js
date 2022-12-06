@@ -12,7 +12,7 @@ import "./App.css";
 const Particles = () => {
   return (
     <>
-      <ParticlesBg className="particles" type="cobweb" bg={true} num={1} />
+      <ParticlesBg className="particles" type="cobweb" bg={true} num={36} />
     </>
   );
 };
@@ -27,8 +27,38 @@ class App extends Component {
       box: {},
       route: "signIn",
       isSignIn: false,
+      user: [
+        {
+          id: "",
+          name: "",
+          email: "",
+          // password: "",
+          entries: 0,
+          joined: "",
+        },
+      ],
     };
   }
+
+  // connect with the db server
+  componentDidMount() {
+    fetch("http://localhost:3001")
+      .then((response) => response.json())
+      .then(console.log);
+  }
+
+  loadUser = (data) => {
+    this.setState({
+      user: {
+        id: data.id,
+        name: data.name,
+        email: data.email,
+        // password: "",
+        entries: data.entries,
+        joined: data.joined,
+      },
+    });
+  };
 
   calculateFaceLocation = (data) => {
     const clarifaiFace = JSON.parse(data, null, 2).outputs[0].data.regions[0]
@@ -85,9 +115,27 @@ class App extends Component {
       }
     )
       .then((response) => response.text())
-      .then((result) => this.displayFacebox(this.calculateFaceLocation(result)))
+      .then((response) => {
+        if (response) {
+          fetch("http://localhost:3001/image", {
+            method: "put",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              id: this.state.user.id,
+            }),
+          })
+            .then((response) => response.json())
+            .then((count) => {
+              this.setState(Object.assign(this.state.user, { entries: count }));
+            });
+        }
+        this.displayFacebox(this.calculateFaceLocation(response));
+      })
       .catch((error) => console.log("error", error));
   };
+  //     .then((result) => this.displayFacebox(this.calculateFaceLocation(result)))
+  //     .catch((error) => console.log("error", error));
+  // };
 
   onRouteChange = (route) => {
     if (route === "signOut") {
@@ -96,18 +144,23 @@ class App extends Component {
       this.setState({ isSignIn: true });
     }
     this.setState({ route: route });
-   
   };
 
   render() {
     return (
       <div className="App">
         <Particles />
-        <Navigation isSignIn={this.state.isSignIn} onRouteChange={this.onRouteChange} />
+        <Navigation
+          isSignIn={this.state.isSignIn}
+          onRouteChange={this.onRouteChange}
+        />
         {this.state.route === "home" ? (
           <div>
             <Logo />
-            <Rank />
+            <Rank
+              name={this.state.user.name}
+              entries={this.state.user.entries}
+            />
             <ImageLinkForm
               onInputChange={this.onInputChange}
               onBtnSubmit={this.onBtnSubmit}
@@ -115,9 +168,12 @@ class App extends Component {
             <FaceRecognition box={this.state.box} imageUrl={this.state.input} />
           </div>
         ) : this.state.route === "signIn" ? (
-          <SignIn onRouteChange={this.onRouteChange} />
+          <SignIn onRouteChange={this.onRouteChange} loadUser={this.loadUser} />
         ) : (
-          <Register onRouteChange={this.onRouteChange} />
+          <Register
+            onRouteChange={this.onRouteChange}
+            loadUser={this.loadUser}
+          />
         )}
       </div>
     );
