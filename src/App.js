@@ -17,12 +17,8 @@ const Particles = () => {
   );
 };
 
-class App extends Component {
-  // use the constructor to catch
-  constructor() {
-    super();
-    this.state = {
-      input: "",
+const init ={
+  input: "",
       // imageUrl:'',
       box: {},
       route: "signIn",
@@ -36,8 +32,14 @@ class App extends Component {
           entries: 0,
           joined: "",
         },
-      ],
-    };
+      ]
+
+}
+class App extends Component {
+  // use the constructor to catch
+  constructor() {
+    super();
+    this.state = init;
   }
 
   // connect with the db server
@@ -139,7 +141,7 @@ class App extends Component {
 
   onRouteChange = (route) => {
     if (route === "signOut") {
-      this.setState({ isSignIn: false });
+      this.setState(init);
     } else if (route === "home") {
       this.setState({ isSignIn: true });
     }
