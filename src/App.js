@@ -41,11 +41,11 @@ class App extends Component {
   }
 
   // connect with the db server
-  componentDidMount() {
-    fetch("http://localhost:3001")
-      .then((response) => response.json())
-      .then(console.log);
-  }
+  // componentDidMount() {
+  //   fetch("http://localhost:3000")
+  //     .then((response) => response.json())
+  //     .then(console.log);
+  // }
 
   loadUser = (data) => {
     this.setState({
@@ -117,7 +117,7 @@ class App extends Component {
       .then((response) => response.text())
       .then((response) => {
         if (response) {
-          fetch("http://localhost:3001/image", {
+          fetch("http://localhost:3000/image", {
             method: "put",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
